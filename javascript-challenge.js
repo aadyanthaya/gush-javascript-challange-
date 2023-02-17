@@ -33,16 +33,18 @@ var _k = _interopRequireDefault(require("./k"));
 var _drawers = _interopRequireDefault(require("./widgets/drawers"));
 var _extendingForm = _interopRequireDefault(require("./widgets/extending-form"));
 var _tabs = _interopRequireDefault(require("./widgets/tabs"));
+var _linkedCheckbox = _interopRequireDefault(require("./widgets/linked-checkbox"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 document.addEventListener("DOMContentLoaded", function () {
   (0, _k["default"])({
     drawers: _drawers["default"],
     extendingForm: _extendingForm["default"],
-    tabs: _tabs["default"]
+    tabs: _tabs["default"],
+    linkedCheckbox: _linkedCheckbox["default"]
   }, document);
 });
 
-},{"./k":1,"./widgets/drawers":3,"./widgets/extending-form":4,"./widgets/tabs":5}],3:[function(require,module,exports){
+},{"./k":1,"./widgets/drawers":3,"./widgets/extending-form":4,"./widgets/linked-checkbox":5,"./widgets/tabs":6}],3:[function(require,module,exports){
 "use strict";
 
 function accordion(widget) {
@@ -100,6 +102,75 @@ function extendingForm(widget) {
 module.exports = extendingForm;
 
 },{}],5:[function(require,module,exports){
+"use strict";
+
+function linkedCheckbox(widget) {
+  var checkboxes = widget.querySelectorAll("[type=checkbox]");
+  var controller = widget.querySelector("[kjs-role=controller]");
+  var related = widget.querySelectorAll("[kjs-role=related]");
+  var relatedArr = Array.from(related);
+  function setup() {
+    var isAllChecked = relatedArr.every(function (r) {
+      return r.checked;
+    });
+    var isNoneChecked = relatedArr.every(function (r) {
+      return !r.checked;
+    });
+    controller.checked = isAllChecked;
+    controller.indeterminate = !isAllChecked && !isNoneChecked;
+  }
+  function onChange(e) {
+    var targetRoleType = e.target.getAttribute("kjs-role");
+    if (targetRoleType === "controller") {
+      switch (controller.checked) {
+        case true:
+          var isSomeChecked = relatedArr.some(function (r) {
+            return r.checked;
+          });
+          if (isSomeChecked) {
+            related.forEach(function (relate) {
+              return relate.checked = false;
+            });
+            e.target.checked = false;
+          } else {
+            related.forEach(function (relate) {
+              return relate.checked = true;
+            });
+          }
+          break;
+        case false:
+          related.forEach(function (relate) {
+            return relate.checked = false;
+          });
+          break;
+      }
+    } else {
+      var isAllChecked = relatedArr.every(function (r) {
+        return r.checked;
+      });
+      var isNoneChecked = relatedArr.every(function (r) {
+        return !r.checked;
+      });
+      controller.checked = isAllChecked;
+      controller.indeterminate = !isAllChecked && !isNoneChecked;
+    }
+  }
+  var actions = [];
+  checkboxes.forEach(function (checkbox) {
+    actions.push({
+      element: checkbox,
+      event: "change",
+      handler: onChange
+    });
+  });
+  return {
+    setup: setup,
+    actions: actions
+  };
+}
+module.exports = linkedCheckbox;
+
+},{}],6:[function(require,module,exports){
 "use strict";
 
 function tabs(widget) {

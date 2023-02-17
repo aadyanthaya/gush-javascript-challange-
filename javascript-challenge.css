@@ -84,3 +84,8 @@ form[kjs-type=extendingForm] [kjs-role=extension] {
     display: none; }
   [kjs-type=tabs] [kjs-role=content] img {
     width: 100%; }
+
+[kjs-type="linkedCheckbox"] label {
+  font-family: system-ui, sans-serif;
+  font-weight: bold;
+  color: #00B7BD; }
